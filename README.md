@@ -50,7 +50,7 @@ Steps:
 ## Channels Config
 
 <details>
-  <summary>API More Details:</summary>
+  <summary>More Details:</summary>
 
 Next, configure the CHANNEL_LAYERS by setting a default Redis backend and routing in the settings.py file. This can go at the bottom of the file.
 
