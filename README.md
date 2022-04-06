@@ -4,21 +4,25 @@
 
 Our server-side application uses:
 
-Python (v3.9)
-Django (v4.0)
-Django Channels (v3.0)
-Django REST Framework (v3.13)
-pytest (v6.2)
-Redis (v6.2)
-PostgreSQL (v14.1)
+- Python (v3.9)
+- Django (v4.0)
+- Django Channels (v3.0)
+- Django REST Framework (v3.13)
+- pytest (v6.2)
+- Redis (v6.2)
+- PostgreSQL (v14.1)
+- Faker (13.3.4)
+- factory-boy (3.2.0)
+
 Client-side:
 
-Node.js (v16.13)
-Angular (v13.0)
+- Node.js (v16.13)
+- Angular (v13.0)
+
 Reverse-proxy:
 
-Nginx (v1.21)
-We'll also use Docker v20.10.11.
+- Nginx (v1.21)
+- Docker (v20.10.11).
 
 Steps:
 
@@ -37,6 +41,7 @@ Steps:
 `PONG`
 
 - set system enviroments:
+
 `vim $VIRTUAL_ENV/bin/postactivate`
 
 `export PGDATABASE=taxi PGUSER=taxi PGPASSWORD=taxi`
@@ -44,6 +49,7 @@ Steps:
 - We've also added an AUTH_USER_MODEL setting to make Django reference a user model of our design instead of the built-in one since we'll need to store more user data than what the standard fields allow.
 
 - Make migrations and migrate
+
 `python manage.py makemigrations`
 `python manage.py migrate`
 
