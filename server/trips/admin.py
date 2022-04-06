@@ -1,3 +1,11 @@
-from django.contrib import admin
+# server/trips/admin.py
 
-# Register your models here.
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
+
+from .models import User
+
+
+@admin.register(User)
+class UserAdmin(DefaultUserAdmin):
+    pass
