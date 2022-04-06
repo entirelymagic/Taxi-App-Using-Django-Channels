@@ -1,23 +1,25 @@
 [tool.poetry]
+authors = ["entirelymagic <entirelymagic@gmail.com>"]
+description = "Uber-App-Using-Django-Channels"
 name = "taxi-ng-app"
 version = "0.1.0"
-description = "Uber-App-Using-Django-Channels"
-authors = ["entirelymagic <entirelymagic@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-django = "4.0"
-djangorestframework = "3.13.1"
+Pillow = "8.4.0"
 channels = "3.0.4"
 channels-redis = "3.3.1"
-pytest-asyncio = "0.16.0"
-pytest-django = "4.5.2"
-Pillow = "8.4.0"
+django = "4.0"
+djangorestframework = "3.13.1"
 djangorestframework-simplejwt = "5.0.0"
 psycopg2-binary = "2.9.2"
-
+pytest-asyncio = "0.16.0"
+pytest-django = "4.5.2"
+python = "^3.9"
+# faker and factory for testing
+Faker = "13.3.4"
+factory-boy = "3.2.0"
 [tool.poetry.dev-dependencies]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
