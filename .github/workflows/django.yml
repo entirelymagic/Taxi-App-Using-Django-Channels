@@ -23,18 +23,20 @@ jobs:
     env: # Django Settings + Slack Webhook
       DJANGO_SETTINGS_MODULE: taxi.settings.testing
       TAXI_DJANGO_SETTINGS_MODULE: taxi.settings.testing
-      DATABASE_NAME: github-actions
-      DATABASE_USER: postgres
-      DATABASE_PASSWORD: postgres
+      PGDATABASE: taxi
+      PGUSER: taxi
+      PGPASSWORD: taxi
+      PGHOST: 'localhost'
+      PGPORT: "5432"
       # POETRY_VIRTUALENVS_CREATE: false
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     services:
       postgres: # we need a postgres docker image to be booted a side car service to run the tests that needs a db
         image: postgres:14
         env: # the environment variable must match with app/settings.py if block of DATBASES variable otherwise test will fail due to connectivity issue.
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: github-actions
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: github-actions
         ports:
           - 5432:5432 # exposing 5432 port for application to use
         # needed because the postgres container does not provide a healthcheck
