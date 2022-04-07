@@ -84,6 +84,27 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
 
         await self.send_json({'type': 'echo.message', 'data': trip_data})
 
+    async def cancel_trip(self, message):
+        data = message.get('data')
+        trip = await self._update_trip(data)
+        trip_id = f'{trip.id}'
+        trip_data = await self._get_trip_data(trip)
+
+        # Send update to rider and driver.
+        await self.channel_layer.group_send(
+            group=trip_id,
+            message={'type': 'echo.message', 'data': trip_data},
+        )
+        await self.channel_layer.group_send(
+            group='drivers',
+            message={'type': 'echo.message', 'data': trip_data},
+        )
+        # Remove driver and rider from the trip group.
+        await self.channel_layer.group_discard(group=trip_id, channel=self.channel_name)
+        # Send update to the drivers.
+
+        await self.send_json({'type': 'echo.message', 'data': trip_data})
+
     async def disconnect(self, code):
         user = self.scope['user']
         if user.is_anonymous:
@@ -108,3 +129,5 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
             await self.echo_message(content)
         elif message_type == 'update.trip':
             await self.update_trip(content)
+        elif message_type == 'cancel.trip':
+            await self.cancel_trip(content)
