@@ -23,9 +23,9 @@ jobs:
     env: # Django Settings + Slack Webhook
       DJANGO_SETTINGS_MODULE: taxi.settings.testing
       TAXI_DJANGO_SETTINGS_MODULE: taxi.settings.testing
-      PGDATABASE: taxi
-      PGUSER: taxi
-      PGPASSWORD: taxi
+      PGDATABASE: github-actions
+      PGUSER: postgres
+      PGPASSWORD: postgres
       PGHOST: 'localhost'
       PGPORT: "5432"
       # POETRY_VIRTUALENVS_CREATE: false
