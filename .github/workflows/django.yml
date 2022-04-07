@@ -22,6 +22,7 @@ jobs:
       DATABASE_NAME: github-actions
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres
+      POETRY_VIRTUALENVS_CREATE: false
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     services:
       postgres: # we need a postgres docker image to be booted a side car service to run the tests that needs a db
