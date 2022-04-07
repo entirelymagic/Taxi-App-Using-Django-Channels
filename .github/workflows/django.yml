@@ -72,14 +72,16 @@ jobs:
       - name: Run Migrations # run migrations to create table in side car db container
         run: |
           source $VENV
-          python server/manage.py migrate
+          cd server
+          python manage.py migrate
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
       - name: Run Test # running tests
         run: |
           source $VENV
-          python server/manage.py test trips
+          cd server
+          python manage.py test trips
 
       - uses: act10ns/slack@v1  # post workflow status to slack
         with:
