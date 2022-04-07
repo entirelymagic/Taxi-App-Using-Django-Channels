@@ -22,7 +22,7 @@ jobs:
       DATABASE_NAME: github-actions
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres
-      POETRY_VIRTUALENVS_CREATE: false
+      # POETRY_VIRTUALENVS_CREATE: false
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     services:
       postgres: # we need a postgres docker image to be booted a side car service to run the tests that needs a db
@@ -36,47 +36,35 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      #----------------------------------------------
-      #       check-out repo and set-up python
-      #----------------------------------------------
-      - name: Check out repository
+         - name: Checkout Code
         uses: actions/checkout@v2
-      - name: Set up python
-        id: setup-python
+
+      - name: Setup Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
-      #----------------------------------------------
-      #  -----  install & configure poetry  -----
-      #----------------------------------------------
+          python-version: "3.9"
+          architecture: x64
+
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
+          version: 1.1.11
           virtualenvs-create: true
           virtualenvs-in-project: true
-          installer-parallel: true
 
-      #----------------------------------------------
-      #       load cached venv if cache exists
-      #----------------------------------------------
       - name: Load cached venv
         id: cached-poetry-dependencies
         uses: actions/cache@v2
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      #----------------------------------------------
-      # install dependencies if cache does not exist
-      #----------------------------------------------
+          key: venv-${{ runner.os }}-v1-${{ hashFiles('**/poetry.lock') }}
+
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
-      #----------------------------------------------
-      # install your root project, if required
-      #----------------------------------------------
-      - name: Install library
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --no-root -E bots
 
+      - name: Install Package
+        run: poetry install --no-interaction -E bots
       #----------------------------------------------
       #              run migrations
       #----------------------------------------------
