@@ -38,13 +38,21 @@ jobs:
        #----------------------------------------------
       #       check-out repo and set-up python
       #----------------------------------------------
-      - name: Check out repository
+      - name: Checkout code # checking our the code at current commit that triggers the workflow
         uses: actions/checkout@v2
-      - name: Set up python
-        id: setup-python
+      - name: Cache dependency # caching dependency will make our build faster.
+        uses: actions/cache@v2 # for more info checkout pip section documentation at https://github.com/actions/cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/test.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Setup python environment # setting python environment to 3.x
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: '3.9' # if you want multiple python version run just use matrix strategy in job config. See the documentation of GitHub Actions
+      - name: Check Python version # checking the python version to see if 3.x is installed.
+        run: python --version
       #----------------------------------------------
       #  -----  install & configure poetry  -----
       #----------------------------------------------
@@ -52,7 +60,7 @@ jobs:
         uses: snok/install-poetry@v1
         with:
           virtualenvs-create: false
-          virtualenvs-in-project: false
+          virtualenvs-in-project: true
           installer-parallel: true
 
       #----------------------------------------------
