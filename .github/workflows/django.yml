@@ -23,6 +23,9 @@ jobs:
     env: # Django Settings + Slack Webhook
       DJANGO_SETTINGS_MODULE: taxi.settings.testing
       TAXI_DJANGO_SETTINGS_MODULE: taxi.settings.testing
+      POSTGRES_DB: github-actions
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       # POETRY_VIRTUALENVS_CREATE: false
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     services:
