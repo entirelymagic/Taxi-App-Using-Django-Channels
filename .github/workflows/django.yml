@@ -16,10 +16,13 @@ on:
 # three job definition
 jobs:
   health-check-job: # health check job for testing and code formatting check
+    defaults:
+      run:
+        working-directory: ./server
     runs-on: ubuntu-latest # os for running the job
     env: # Django Settings + Slack Webhook
-      DJANGO_SETTINGS_MODULE: server.taxi.settings.testing
-      TAXI_DJANGO_SETTINGS_MODULE: server.taxi.settings.testing
+      DJANGO_SETTINGS_MODULE: taxi.settings.testing
+      TAXI_DJANGO_SETTINGS_MODULE: taxi.settings.testing
       DATABASE_NAME: github-actions
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres
@@ -72,7 +75,6 @@ jobs:
       - name: Run Migrations # run migrations to create table in side car db container
         run: |
           source $VENV
-          cd server
           python manage.py migrate
       #----------------------------------------------
       #              run test suite
@@ -80,7 +82,6 @@ jobs:
       - name: Run Test # running tests
         run: |
           source $VENV
-          cd server
           python manage.py test trips
 
       - uses: act10ns/slack@v1  # post workflow status to slack
