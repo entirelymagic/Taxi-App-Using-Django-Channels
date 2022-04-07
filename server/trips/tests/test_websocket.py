@@ -284,8 +284,8 @@ class TestWebSocket:
                 'pick_up_address': trip.pick_up_address,
                 'drop_off_address': trip.drop_off_address,
                 'status': Trip.CANCELED,
-                'driver': driver.id,
-                'rider': rider.id,
+                # 'driver': driver.id, # not required
+                # 'rider': rider.id, # not required
             },
         }
         await communicator.send_json_to(message)
