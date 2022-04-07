@@ -38,7 +38,20 @@ jobs:
         ports:
           - 5432:5432 # exposing 5432 port for application to use
         # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: 
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options:
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -83,6 +96,10 @@ jobs:
         run: |
           source $VENV
           python manage.py test trips
+      - name: Run Pytest
+        run: |
+          source $VENV
+          python -m pytest
 
       - uses: act10ns/slack@v1  # post workflow status to slack
         with:
