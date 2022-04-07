@@ -83,6 +83,10 @@ jobs:
         run: |
           source $VENV
           python manage.py test trips
+      - name: Run Pytest
+        run: |
+          source $VENV
+          python -m pytest
 
       - uses: act10ns/slack@v1  # post workflow status to slack
         with:
