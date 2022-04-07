@@ -260,3 +260,39 @@ class TestWebSocket:
         assert response == message
 
         await communicator.disconnect()
+
+    async def test_client_can_cancel_trip(self, settings):
+        settings.CHANNEL_LAYERS = TEST_CHANNEL_LAYERS
+
+        # Create trip request.
+        rider, access = await create_user('test.rider@example.com', 'pAssw0rd', 'rider')
+        driver, _ = await create_user('test.driver@example.com', 'pAssw0rd', 'driver')
+        trip = await create_trip(rider=rider, driver=driver)
+        trip_id = f'{trip.id}'
+
+        # Listen for messages as rider.
+        channel_layer = get_channel_layer()
+        await channel_layer.group_add(group=trip_id, channel='test_channel')
+
+        # cancel trip.
+        communicator = WebsocketCommunicator(application=application, path=f'/taxi/?token={access}')
+        await communicator.connect()
+        message = {
+            'type': 'cancel.trip',
+            'data': {
+                'id': trip_id,
+                'pick_up_address': trip.pick_up_address,
+                'drop_off_address': trip.drop_off_address,
+                'status': Trip.CANCELED,
+                # 'driver': driver.id, # not required
+                # 'rider': rider.id, # not required
+            },
+        }
+        await communicator.send_json_to(message)
+        response = await channel_layer.receive('test_channel')
+        response_data = response.get('data')
+        assert response_data['id'] == trip_id
+        assert response_data['rider']['username'] == rider.username
+        assert response_data['driver']['username'] == driver.username
+        assert response_data['status'] == Trip.CANCELED
+        await communicator.disconnect()
