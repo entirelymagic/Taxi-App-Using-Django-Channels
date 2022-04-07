@@ -76,11 +76,18 @@ jobs:
       - name: Install library
         run: poetry install --no-interaction
       #----------------------------------------------
-      #              run test suite
+      #              activate shell env
       #----------------------------------------------
-        
+      - name: activate poetry shell
+        run: poetry shell
+      #----------------------------------------------
+      #              run migrations
+      #----------------------------------------------
       - name: Run Migrations # run migrations to create table in side car db container
         run: python server/manage.py migrate
+      #----------------------------------------------
+      #              run test suite
+      #----------------------------------------------
       - name: Run Test # running tests
         run: python server/manage.py test trips
 
