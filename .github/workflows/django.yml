@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest # os for running the job
     env: # Django Settings + Slack Webhook
       DJANGO_SETTINGS_MODULE: server.taxi.settings.testing
+      TAXI_DJANGO_SETTINGS_MODULE: server.taxi.settings.testing
       DATABASE_NAME: github-actions
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres
