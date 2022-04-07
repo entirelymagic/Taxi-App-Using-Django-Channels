@@ -76,19 +76,21 @@ jobs:
       #----------------------------------------------
       - name: Install library
         run: poetry install --no-interaction
-      - run: |
-          source $VENV
-          django --version
+
       #----------------------------------------------
       #              run migrations
       #----------------------------------------------
       - name: Run Migrations # run migrations to create table in side car db container
-        run: python server/manage.py migrate
+        run: |
+          source $VENV
+          python server/manage.py migrate
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
       - name: Run Test # running tests
-        run: python server/manage.py test trips
+        run: |
+          source $VENV
+          python server/manage.py test trips
 
       - uses: act10ns/slack@v1  # post workflow status to slack
         with:
