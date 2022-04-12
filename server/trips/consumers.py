@@ -1,3 +1,5 @@
+import copy
+
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
@@ -82,10 +84,12 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
         # Add driver to the trip group.
         await self.channel_layer.group_add(group=trip_id, channel=self.channel_name)
 
-        # update the driver group
+        # update the driver group to remove the trip from the group.
+        trip_copy = copy.deepcopy(trip_data)
+        trip_copy["driver"] = None
         await self.channel_layer.group_send(
             group='drivers',
-            message={'type': 'echo.message', 'data': trip_data},
+            message={'type': 'echo.message', 'data': trip_copy},
         )
 
         await self.send_json({'type': 'echo.message', 'data': trip_data})
