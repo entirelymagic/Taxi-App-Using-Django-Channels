@@ -82,6 +82,12 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
         # Add driver to the trip group.
         await self.channel_layer.group_add(group=trip_id, channel=self.channel_name)
 
+        # update the driver group
+        await self.channel_layer.group_send(
+            group='drivers',
+            message={'type': 'echo.message', 'data': trip_data},
+        )
+
         await self.send_json({'type': 'echo.message', 'data': trip_data})
 
     async def cancel_trip(self, message):
