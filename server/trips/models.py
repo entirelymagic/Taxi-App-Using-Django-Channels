@@ -41,6 +41,7 @@ class Trip(models.Model):
     rider = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.DO_NOTHING, related_name='trips_as_rider'
     )
+    driver_location = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.id}'
