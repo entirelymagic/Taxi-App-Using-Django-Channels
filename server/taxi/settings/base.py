@@ -156,4 +156,3 @@ SIMPLE_JWT = {
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = Path(BASE_DIR / 'media')
-print(MEDIA_ROOT)
