@@ -2,6 +2,8 @@ import copy
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from channels.layers import get_channel_layer
+from django.db.models import Q
 
 from trips.models import Trip
 from trips.serializers import NestedTripSerializer, TripSerializer
@@ -29,7 +31,7 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
         user_groups = user.groups.values_list('name', flat=True)
         if 'driver' in user_groups:
             trip_ids = user.trips_as_driver.exclude(status=Trip.COMPLETED).only('id').values_list('id', flat=True)
-        else:
+        elif "rider" in user_groups:
             trip_ids = user.trips_as_rider.exclude(status=Trip.COMPLETED).only('id').values_list('id', flat=True)
         return map(str, trip_ids)
 
@@ -39,6 +41,18 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
         serializer = TripSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         return serializer.update(instance, serializer.validated_data)
+
+    @database_sync_to_async
+    def _check_if_trip_allowed(self):
+        user = self.scope['user']
+        user_group = user.groups.first().name
+        # Check if there is an active trip and return an error if there is.
+        if user_group == 'rider':
+            if user.trips_as_rider.exclude(status=Trip.COMPLETED).exists():
+                return self.send_json({'type': 'error', 'data': 'You already have an active trip.'})
+        else:
+            return self.send_json({'type': 'error', 'data': 'You are not a rider.'})
+        return None
 
     async def connect(self):
         user = self.scope['user']
@@ -54,6 +68,13 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
             await self.accept()
 
     async def create_trip(self, message):
+        """allow only rider users who don't have an active trip to create a trip"""
+
+        # Allow only rider users to create a trip
+        active_trip_error_message = await self._check_if_trip_allowed()
+        if active_trip_error_message:
+            return await active_trip_error_message
+
         data = message.get('data')
         trip = await self._create_trip(data)
         trip_data = await self._get_trip_data(trip)
@@ -63,11 +84,17 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
             group='drivers',
             message={'type': 'echo.message', 'data': trip_data},
         )
-
         # Add rider to trip group.
-        await self.channel_layer.group_add(group=f'{trip.id}', channel=self.channel_name)
+        await self.channel_layer.group_add(group=trip.id, channel=self.channel_name)
 
         await self.send_json({'type': 'echo.message', 'data': trip_data})
+        
+    # only add extra rider to trip group when rider desire this
+    async def add_extra_rider(self, message):
+        trip_id = message.get('data').get('trip_id')
+        extra_user = message.get('data').get('extra_user')
+        await self.channel_layer.group_add(group=trip_id, channel=extra_user)
+        
 
     async def update_trip(self, message):
         data = message.get('data')
@@ -117,6 +144,7 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, code):
         user = self.scope['user']
+
         if user.is_anonymous:
             await self.close()
         else:
@@ -141,3 +169,5 @@ class TaxiConsumer(AsyncJsonWebsocketConsumer):
             await self.update_trip(content)
         elif message_type == 'cancel.trip':
             await self.cancel_trip(content)
+        elif message_type == 'add.extra.rider':
+            await self.add_extra_rider(content)

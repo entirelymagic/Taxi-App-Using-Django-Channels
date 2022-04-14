@@ -45,6 +45,7 @@ Steps:
 `vim $VIRTUAL_ENV/bin/postactivate`
 
 `export PGDATABASE=taxi PGUSER=taxi PGPASSWORD=taxi`
+`export DJANGO_SETTINGS_MODULE=taxi.settings.local`
 
 - We've also added an AUTH_USER_MODEL setting to make Django reference a user model of our design instead of the built-in one since we'll need to store more user data than what the standard fields allow.
 
@@ -52,6 +53,16 @@ Steps:
 
 `python manage.py makemigrations`
 `python manage.py migrate`
+
+- To install and activate the virtualenvironment:
+1.Required packages:
+`Poetry`
+IF you do not have it installed, read docs:
+`https://python-poetry.org/docs/#installation`
+
+2.Activate the virtual environment and install the packages:
+`poetry install`
+`poetry shell`
 
 ## Channels Config
 
@@ -86,7 +97,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.postgres',
     'django.contrib.staticfiles',
-    'channels', # new
+    'channels',
     'rest_framework',
     'trips',
 ]
